@@ -10,6 +10,10 @@ using Cursor, Codex, or Claude Code. It calls OpenAI, DeepSeek, or any LLM API.
 You're about to share the link with friends or a small team. You need to know:
 will it hold up?
 
+If you need to stress-test a static website or measure raw HTTP throughput, use
+wrk or k6. If you need to know whether your AI app is ready for 10 friends, use
+vibeready.
+
 ## Why this exists
 
 General-purpose load testers (wrk, k6, vegeta) measure HTTP performance.
@@ -121,17 +125,11 @@ vibeready produces three outputs:
 **Console** (always printed):
 
 ```text
-Total:          285
-Success:        278
-Failed:         7
-Error Rate:     2.46%
-QPS:            9.50
-Avg:            1.05s     P50: 1.02s     P95: 2.10s     P99: 3.80s
-Avg TTFT:       320ms     TTFT P50: 280ms    TTFT P95: 650ms
-Upstream:       780ms     Overhead: 270ms    Upstream %: 74.3%
-Provider:       deepseek     Model: deepseek-chat
-Cache Hit %:    12.0%
-429 Count:      3 (1.1%)
+Total: 285  Success: 278  Failed: 7  Error Rate: 2.46%  QPS: 9.50
+Avg: 1.05s  P50: 1.02s  P95: 2.10s  P99: 3.80s
+Avg TTFT: 320ms  TTFT P50: 280ms  TTFT P95: 650ms
+Upstream: 780ms  Overhead: 270ms  Upstream %: 74.3%
+Provider: deepseek  Model: deepseek-chat  Cache Hit: 12.0%  429: 3 (1.1%)
 ```
 
 **`result.json`** — machine-readable results for scripts or future comparison.
@@ -156,34 +154,30 @@ After the run, open `agent-report.md` and paste it into your coding agent:
 
 vibeready detects → coding agent fixes → vibeready re-tests.
 
-## Features
+## Semi-white-box AI metrics
 
-### Core (always available)
-
-- HTTP and HTTP streaming (SSE / JSONL / raw)
-- TTFT, ITL, token throughput, streaming abort rate
-- Latency percentiles (P50/P90/P95/P99) with human-readable output
-- Status code and error category breakdown (timeout / network / HTTP / 429)
-- Payload rotation from directory (`--payload-dir`)
-- QPS limiting and ramp-up (`--qps`, `--ramp-up`)
-- JSON report (`--output`) and agent-friendly Markdown report (`--agent-context`)
-
-### Semi-white-box AI metrics
-
-If your backend returns these response headers, vibeready computes upstream
-latency, backend overhead, cache hit rate, and per-request token counts:
+If your backend adds these response headers, vibeready can tell you where the
+time goes and whether caching helps:
 
 ```
-x-ai-provider: deepseek
-x-ai-model: deepseek-chat
-x-ai-upstream-latency-ms: 780
-x-ai-first-token-ms: 280
-x-ai-input-tokens: 50
-x-ai-output-tokens: 120
-x-ai-cache-hit: false
+x-ai-provider            → which model provider (openai, deepseek, etc.)
+x-ai-model               → which model (gpt-4o, deepseek-chat, etc.)
+x-ai-upstream-latency-ms → how long the model API took (separate from your backend)
+x-ai-first-token-ms      → TTFT measured at the model side
+x-ai-input-tokens        → prompt token count
+x-ai-output-tokens       → completion token count
+x-ai-cache-hit           → whether the response was served from cache
 ```
 
-See [docs/semi-white-box.md](docs/semi-white-box.md) for integration instructions.
+With these headers, vibeready computes: backend overhead (`total − upstream`),
+upstream ratio (`upstream / total`), cache hit rate, and estimated cost (when
+`--model-price` is set).
+
+All headers are optional. vibeready degrades gracefully — without them you still
+get latency, TTFT, error rates, and status codes.
+
+See [docs/semi-white-box.md](docs/semi-white-box.md) for Python and Node.js
+integration examples.
 
 <details>
 <summary><strong>Advanced capabilities</strong> (click to expand)</summary>
@@ -205,16 +199,11 @@ See [docs/advanced/](docs/advanced/) for detailed guides.
 
 ## Why not just use k6?
 
-You can ask a coding agent to generate a k6 script, and that works for general
-HTTP load testing. But:
-
-- Agent-generated k6 scripts measure HTTP latency, not TTFT or token speed.
-- They do not tell you whether the bottleneck is your code or the model API.
-- Each generated script is different — no standardized re-test workflow.
-
-vibeready is not a k6 replacement. It focuses on a narrower problem:
-standardized AI app readiness checks with model-aware metrics and agent-friendly
-reports that stay comparable across runs.
+k6 and wrk are excellent general-purpose load testers. vibeready focuses on a
+narrower problem: AI app readiness checks with TTFT, token speed, and
+upstream-vs-backend split — metrics traditional tools don't capture without
+custom scripting. It also produces an agent-readable report for the fix→re-test
+cycle.
 
 ## Documentation
 

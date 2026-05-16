@@ -7,6 +7,9 @@
 
 你用 Cursor、Codex、Claude Code 等工具做了一个 AI 应用——翻译服务、聊天机器人、文档总结。它调用 OpenAI、DeepSeek 或任何 LLM API。你准备把链接发给朋友、微信群或者小团队试用。你需要确认：扛得住吗？
 
+如果是静态网站压测或纯 HTTP 吞吐量测试，用 wrk 或 k6 更合适。如果想知道
+AI 应用能不能扛住 10 个朋友同时用，用 vibeready。
+
 ## 为什么需要它
 
 通用压测工具（wrk、k6、vegeta）测的是 HTTP 性能。它们告诉你 p95 延迟和错误率。这对 AI 应用来说不够。
@@ -113,17 +116,11 @@ vibeready 输出三样东西：
 **Console**（始终输出）：
 
 ```text
-Total:          285
-Success:        278
-Failed:         7
-Error Rate:     2.46%
-QPS:            9.50
-Avg:            1.05s     P50: 1.02s     P95: 2.10s     P99: 3.80s
-Avg TTFT:       320ms     TTFT P50: 280ms    TTFT P95: 650ms
-Upstream:       780ms     Overhead: 270ms    Upstream %: 74.3%
-Provider:       deepseek     Model: deepseek-chat
-Cache Hit %:    12.0%
-429 Count:      3 (1.1%)
+Total: 285  Success: 278  Failed: 7  Error Rate: 2.46%  QPS: 9.50
+Avg: 1.05s  P50: 1.02s  P95: 2.10s  P99: 3.80s
+Avg TTFT: 320ms  TTFT P50: 280ms  TTFT P95: 650ms
+Upstream: 780ms  Overhead: 270ms  Upstream %: 74.3%
+Provider: deepseek  Model: deepseek-chat  Cache Hit: 12.0%  429: 3 (1.1%)
 ```
 
 **`result.json`** — 机器可读的结构化结果，用于脚本或日后对比。
@@ -144,33 +141,26 @@ Cache Hit %:    12.0%
 
 vibeready 检测 → coding agent 修复 → vibeready 复测。
 
-## 功能
+## 半白盒 AI 指标
 
-### 核心（始终可用）
-
-- HTTP 和 HTTP streaming（SSE / JSONL / raw）
-- TTFT、ITL、token 吞吐率、流式中断率
-- 延迟百分位（P50/P90/P95/P99），人类可读
-- 状态码和错误类别分类（timeout / network / HTTP / 429）
-- Payload 目录轮转（`--payload-dir`）
-- QPS 限制和渐进加压（`--qps`、`--ramp-up`）
-- JSON 报告（`--output`）和 Agent 友好的 Markdown 报告（`--agent-context`）
-
-### 半白盒 AI 指标
-
-如果你的后端返回这些响应头，vibeready 会计算上游延迟、后端开销、缓存命中率：
+如果你的后端加上这些响应头，vibeready 能告诉你时间花在哪、缓存有没有用：
 
 ```
-x-ai-provider: deepseek
-x-ai-model: deepseek-chat
-x-ai-upstream-latency-ms: 780
-x-ai-first-token-ms: 280
-x-ai-input-tokens: 50
-x-ai-output-tokens: 120
-x-ai-cache-hit: false
+x-ai-provider            → 模型提供商（openai、deepseek 等）
+x-ai-model               → 模型名称（gpt-4o、deepseek-chat 等）
+x-ai-upstream-latency-ms → 模型 API 耗时（与你的后端开销分开）
+x-ai-first-token-ms      → 模型侧测量的 TTFT
+x-ai-input-tokens        → prompt token 数量
+x-ai-output-tokens       → 输出 token 数量
+x-ai-cache-hit           → 是否命中缓存
 ```
 
-详见 [docs/semi-white-box.md](docs/semi-white-box.md)（英文）。
+有了这些 header，vibeready 可以算出：后端开销（`total − upstream`）、上游占比
+（`upstream / total`）、缓存命中率，以及成本估算（设置 `--model-price` 后）。
+
+所有 header 都是可选的。不加也能拿到延迟、TTFT、错误率和状态码。
+
+集成示例见 [docs/semi-white-box.md](docs/semi-white-box.md)（Python / Node.js）。
 
 <details>
 <summary><strong>高级能力</strong>（点击展开）</summary>
@@ -192,14 +182,9 @@ x-ai-cache-hit: false
 
 ## 和 k6 的区别
 
-你可以让 coding agent 帮你写 k6 脚本，对通用 HTTP 压测来说这没毛病。但：
-
-- Agent 生成的 k6 脚本测 HTTP 延迟，不测 TTFT、token 速率。
-- 它们不会告诉你瓶颈在后端还是模型 API。
-- 每次生成的脚本不同，无法形成标准化的"修完 → 复测 → 对比"流程。
-
-vibeready 不替代 k6。它聚焦一个更窄的问题：AI 应用上线的标准化体检，
-产出模型感知的指标和 coding agent 可直接消化的报告。
+k6 和 wrk 是优秀的通用压测工具。vibeready 聚焦一个更窄的问题：AI 应用上线检查，
+关注 TTFT、token 速率和上游/后端延迟拆分——这些是传统工具不写脚本测不到的。
+同时输出 coding agent 可直接消费的诊断报告。
 
 ## 文档
 
