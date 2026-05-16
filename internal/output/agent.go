@@ -121,50 +121,56 @@ func WriteAgentReport(path string, cfg config.Config, summary types.Summary) err
 }
 
 func writeDiagnostics(b *strings.Builder, s types.Summary) {
+	b.WriteString("*Diagnostic notes are heuristics based on observed metrics. They are not definitive — use them as starting points for investigation, not final conclusions.*\n\n")
 	issues := 0
 
-	if s.ErrorRate > 0.01 {
+	if s.ErrorRate > 0.02 {
 		b.WriteString(fmt.Sprintf("- **Elevated error rate (%.2f%%)**: Common causes: timeouts, rate limiting, or upstream server errors. ", s.ErrorRate*100))
+		if s.TotalRequests < 100 {
+			b.WriteString("Small sample size — consider running a longer test for a more reliable signal.\n")
+		}
 		issues++
 	}
-	if s.Percentiles.P99 > s.AvgLatency*3 {
+	if s.Percentiles.P99 > s.AvgLatency*5 {
 		b.WriteString(fmt.Sprintf("- **Long tail latency**: P99 (%s) is %.1fx the average. ", util.FormatDuration(s.Percentiles.P99), float64(s.Percentiles.P99)/float64(s.AvgLatency)))
-		b.WriteString("Common causes include resource contention or GC pauses.\n")
+		b.WriteString("May indicate resource contention, GC pauses, or queuing under load. If P99 is acceptable for your use case, this can be ignored.\n")
 		issues++
 	}
-	if s.UpstreamLatencyRatio > 0 && s.UpstreamLatencyRatio > 0.8 {
-		b.WriteString(fmt.Sprintf("- **Likely model API bottleneck (%.0f%% of total time)**: ", s.UpstreamLatencyRatio*100))
-		b.WriteString("Optimizing your backend code may have limited impact. Consider:\n")
-		b.WriteString("  - Switching to a faster model or provider\n")
+	if s.UpstreamLatencyRatio > 0 && s.UpstreamLatencyRatio > 0.85 {
+		b.WriteString(fmt.Sprintf("- **High upstream latency ratio (%.0f%% of total time)**: ", s.UpstreamLatencyRatio*100))
+		b.WriteString("The model API dominates response time. If this ratio is accurate (depends on correct `x-ai-upstream-latency-ms` header from your backend), optimizing backend code will have limited impact. Consider:\n")
+		b.WriteString("  - A faster model or provider\n")
 		b.WriteString("  - Enabling streaming if not already used\n")
 		b.WriteString("  - Adding caching for repeated prompts\n")
 		issues++
 	}
-	if s.UpstreamLatencyRatio > 0 && s.UpstreamLatencyRatio < 0.3 {
-		b.WriteString(fmt.Sprintf("- **Likely backend-side bottleneck (%.0f%% overhead)**: ", (1-s.UpstreamLatencyRatio)*100))
-		b.WriteString("The model responds quickly but your code adds significant latency. Common causes:\n")
+	if s.UpstreamLatencyRatio > 0 && s.UpstreamLatencyRatio < 0.2 {
+		b.WriteString(fmt.Sprintf("- **Low upstream latency ratio (%.0f%% overhead in backend)**: ", (1-s.UpstreamLatencyRatio)*100))
+		b.WriteString("The model responds quickly but your backend adds noticeable latency. If the upstream ratio is accurate, common causes include:\n")
 		b.WriteString("  - Connection pooling and keep-alive settings\n")
 		b.WriteString("  - Synchronous processing that could be parallelized\n")
 		b.WriteString("  - Serialization/deserialization overhead\n")
 		issues++
 	}
-	if s.StreamingAborted > 0 {
-		b.WriteString(fmt.Sprintf("- **%d streams aborted**: Check timeout settings and error handling in streaming code.\n", s.StreamingAborted))
+	if s.TotalRequests > 0 && float64(s.StreamingAborted)/float64(s.TotalRequests) > 0.01 {
+		b.WriteString(fmt.Sprintf("- **%d streams aborted (%.1f%% of requests)**: ", s.StreamingAborted, float64(s.StreamingAborted)/float64(s.TotalRequests)*100))
+		b.WriteString("May indicate timeout settings, upstream connection drops, or a mismatch between the configured done marker and what the server sends.\n")
 		issues++
 	}
 	has429 := s.StatusCodes[429] > 0
 	if has429 {
-		b.WriteString(fmt.Sprintf("- **Rate limited (429)**: %d requests hit rate limits. ", s.StatusCodes[429]))
-		b.WriteString("Consider: client-side rate limiting, exponential backoff, or a higher API tier.\n")
+		rate := float64(s.StatusCodes[429]) / float64(s.TotalRequests) * 100
+		b.WriteString(fmt.Sprintf("- **Rate limited (429)**: %d requests (%.1f%%) hit rate limits. ", s.StatusCodes[429], rate))
+		b.WriteString("Consider: client-side throttling (`--qps`), exponential backoff, or a higher API tier. If the rate is very low (< 0.5%%), this may be acceptable.\n")
 		issues++
 	}
 	if s.CacheHitRate == 0 && s.Provider != "" {
-		b.WriteString("- **No cache hits detected**: If your prompts have repetition, adding a semantic cache could reduce latency and cost.\n")
+		b.WriteString("- **No cache hits detected**: This may be normal if you don't have a caching layer. If your prompts have repetition, adding semantic caching could reduce latency and cost.\n")
 		issues++
 	}
 
 	if issues == 0 {
-		b.WriteString("No critical issues detected. The service performed within acceptable thresholds.\n")
+		b.WriteString("No significant patterns detected. The service performed within the observed range.\n")
 	}
 	b.WriteString("\n")
 }
