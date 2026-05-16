@@ -5,8 +5,8 @@ import (
 	"io"
 	"text/tabwriter"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/util"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/util"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 type row struct {
@@ -27,8 +27,8 @@ func WriteConsoleSummary(w io.Writer, summary types.Summary) error {
 		{"Min:", util.FormatDuration(summary.MinLatency)},
 		{"Max:", util.FormatDuration(summary.MaxLatency)},
 		{"Avg TTFT:", util.FormatDuration(summary.AvgTTFT)},
-		{"Output Tokens:", fmt.Sprintf("%d", summary.TotalOutputTokens)},
-		{"Avg tok/s:", fmt.Sprintf("%.2f", summary.AvgTokensPerSecond)},
+		{"Output Tokens:", formatTokens(summary.TotalOutputTokens, summary.TokensEstimated)},
+		{"Avg tok/s:", formatTokS(summary.AvgTokensPerSecond, summary.TokensEstimated)},
 		{"Stream Aborts:", fmt.Sprintf("%d", summary.StreamingAborted)},
 		{"P50:", util.FormatDuration(summary.Percentiles.P50)},
 		{"P90:", util.FormatDuration(summary.Percentiles.P90)},
@@ -89,4 +89,18 @@ func WriteConsoleSummary(w io.Writer, summary types.Summary) error {
 	}
 
 	return tw.Flush()
+}
+
+func formatTokens(n int64, estimated bool) string {
+	if estimated {
+		return fmt.Sprintf("%d (est.)", n)
+	}
+	return fmt.Sprintf("%d", n)
+}
+
+func formatTokS(n float64, estimated bool) string {
+	if estimated {
+		return fmt.Sprintf("%.2f (est.)", n)
+	}
+	return fmt.Sprintf("%.2f", n)
 }

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/protocol/httputil"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/protocol/httputil"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

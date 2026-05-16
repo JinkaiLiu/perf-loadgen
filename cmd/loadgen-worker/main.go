@@ -7,8 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/cli"
-	"github.com/JinkaiLiu/perf-loadgen/internal/distributed"
+	"github.com/JinkaiLiu/vibeready/internal/cli"
+	"github.com/JinkaiLiu/vibeready/internal/distributed"
 )
 
 func main() {

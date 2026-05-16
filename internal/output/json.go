@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/config"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/config"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // JSONReport is the stable persisted report structure for the MVP.

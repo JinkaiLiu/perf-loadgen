@@ -3,7 +3,7 @@ package runner
 import (
 	"context"
 
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // Runner executes a single request against a concrete protocol.

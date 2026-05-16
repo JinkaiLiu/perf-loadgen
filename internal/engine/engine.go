@@ -6,10 +6,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/config"
-	"github.com/JinkaiLiu/perf-loadgen/internal/runner"
-	"github.com/JinkaiLiu/perf-loadgen/internal/stats"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/config"
+	"github.com/JinkaiLiu/vibeready/internal/runner"
+	"github.com/JinkaiLiu/vibeready/internal/stats"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // Observer receives live request results and the final summary.

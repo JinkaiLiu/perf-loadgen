@@ -1,9 +1,9 @@
 package websocket
 
 import (
-	"github.com/JinkaiLiu/perf-loadgen/internal/config"
-	"github.com/JinkaiLiu/perf-loadgen/internal/protocol/registry"
-	"github.com/JinkaiLiu/perf-loadgen/internal/runner"
+	"github.com/JinkaiLiu/vibeready/internal/config"
+	"github.com/JinkaiLiu/vibeready/internal/protocol/registry"
+	"github.com/JinkaiLiu/vibeready/internal/runner"
 )
 
 func init() {

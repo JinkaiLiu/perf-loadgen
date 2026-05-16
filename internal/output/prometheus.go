@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/stats"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/stats"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // PrometheusExporter exposes live run metrics in Prometheus text format.

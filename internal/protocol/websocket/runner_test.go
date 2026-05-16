@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // startWSServer starts a real HTTP server on a random port that upgrades to WebSocket.

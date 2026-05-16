@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 func TestCollectorSummary(t *testing.T) {

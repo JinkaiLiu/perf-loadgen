@@ -6,7 +6,7 @@ Standard request/response. Extracts inference metrics from `X-Loadgen-*` and
 `x-ai-*` response headers when present.
 
 ```bash
-./loadgen --url http://localhost:8080/infer --method POST \
+./vibeready --url http://localhost:8080/infer --method POST \
   --body '{"prompt":"hello"}' --concurrency 20 --duration 30s
 ```
 
@@ -17,7 +17,7 @@ text content, token counts, and stream completion signals.
 
 **SSE**:
 ```bash
-./loadgen --url http://localhost:8080/v1/chat/completions --method POST \
+./vibeready --url http://localhost:8080/v1/chat/completions --method POST \
   --body '{"model":"llama3","messages":[{"role":"user","content":"hello"}],"stream":true}' \
   --stream --stream-format sse --stream-text-keys content,delta \
   --stream-token-keys usage.completion_tokens \
@@ -26,7 +26,7 @@ text content, token counts, and stream completion signals.
 
 **JSONL**:
 ```bash
-./loadgen --url http://localhost:8080/stream --method POST \
+./vibeready --url http://localhost:8080/stream --method POST \
   --body '{"prompt":"hello"}' --stream --stream-format jsonl \
   --stream-text-keys text,content --stream-token-keys tokens \
   --concurrency 10 --requests 500
@@ -44,7 +44,7 @@ Requires server reflection enabled on the target. No `.proto` files needed.
 
 **Unary**:
 ```bash
-./loadgen --url localhost:50051 --protocol grpc \
+./vibeready --url localhost:50051 --protocol grpc \
   --proto-service inference.GRPCInferenceService --proto-method ModelInfer \
   --body '{"model_name":"llama3","inputs":[{"name":"prompt","contents":"hello"}]}' \
   --concurrency 50 --duration 30s --timeout 10s
@@ -52,7 +52,7 @@ Requires server reflection enabled on the target. No `.proto` files needed.
 
 **Server-streaming**:
 ```bash
-./loadgen --url localhost:50051 --protocol grpc-stream \
+./vibeready --url localhost:50051 --protocol grpc-stream \
   --proto-service inference.GRPCInferenceService --proto-method ModelStreamInfer \
   --body '{"model_name":"llama3","inputs":[{"name":"prompt","contents":"hello"}]}' \
   --grpc-token-field output_tokens --concurrency 20 --duration 30s
@@ -74,13 +74,13 @@ TLS is auto-detected from the URL scheme: `ws://` uses plain TCP (port 80),
 
 ```bash
 # Plain
-./loadgen --url ws://localhost:8080/graphql --protocol websocket \
+./vibeready --url ws://localhost:8080/graphql --protocol websocket \
   --ws-subprotocol graphql-transport-ws \
   --body '{"type":"subscribe","payload":{"query":"subscription { message }"}}' \
   --concurrency 50 --duration 30s --timeout 10s
 
 # TLS
-./loadgen --url wss://api.example.com/graphql --protocol websocket \
+./vibeready --url wss://api.example.com/graphql --protocol websocket \
   --ws-subprotocol graphql-transport-ws \
   --body '{"type":"subscribe","payload":{"query":"subscription { message }"}}' \
   --concurrency 50 --duration 30s --timeout 10s

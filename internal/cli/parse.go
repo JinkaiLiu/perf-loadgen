@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/config"
+	"github.com/JinkaiLiu/vibeready/internal/config"
 )
 
 // Parse converts CLI flags into validated runtime config.

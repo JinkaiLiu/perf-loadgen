@@ -7,9 +7,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/cli"
-	"github.com/JinkaiLiu/perf-loadgen/internal/engine"
-	"github.com/JinkaiLiu/perf-loadgen/internal/protocol"
+	"github.com/JinkaiLiu/vibeready/internal/cli"
+	"github.com/JinkaiLiu/vibeready/internal/engine"
+	"github.com/JinkaiLiu/vibeready/internal/protocol"
 )
 
 func startMockServer(t *testing.T) *httptest.Server {

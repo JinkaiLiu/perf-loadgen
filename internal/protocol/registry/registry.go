@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/config"
-	"github.com/JinkaiLiu/perf-loadgen/internal/runner"
+	"github.com/JinkaiLiu/vibeready/internal/config"
+	"github.com/JinkaiLiu/vibeready/internal/runner"
 )
 
 // Factory constructs a protocol runner from validated config.

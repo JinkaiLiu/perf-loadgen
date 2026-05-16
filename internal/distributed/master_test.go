@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/config"
+	"github.com/JinkaiLiu/vibeready/internal/config"
 )
 
 func TestMasterRunMergesWorkerSnapshots(t *testing.T) {

@@ -41,6 +41,7 @@ type RunResult struct {
 	TTFT             time.Duration   `json:"ttft,omitempty"`
 	GenerationTime   time.Duration   `json:"generation_time,omitempty"`
 	OutputTokens     int64           `json:"output_tokens,omitempty"`
+	TokensEstimated  bool            `json:"tokens_estimated,omitempty"`
 	TokensPerSecond  float64         `json:"tokens_per_second,omitempty"`
 	StreamingAborted bool            `json:"streaming_aborted,omitempty"`
 	ITLSamples       []time.Duration `json:"-"`
@@ -123,6 +124,7 @@ type Summary struct {
 	AvgTTFTHuman       string        `json:"avg_ttft_human"`
 	TotalOutputTokens  int64         `json:"total_output_tokens"`
 	AvgTokensPerSecond float64       `json:"avg_tokens_per_second"`
+	TokensEstimated    bool          `json:"tokens_estimated,omitempty"`
 	StreamingAborted   int64         `json:"streaming_aborted"`
 	Percentiles        Percentiles   `json:"percentiles"`
 	TTFTPercentiles    Percentiles   `json:"ttft_percentiles,omitempty"`

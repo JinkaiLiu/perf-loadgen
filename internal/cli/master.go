@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/config"
+	"github.com/JinkaiLiu/vibeready/internal/config"
 )
 
 // MasterOptions holds distributed master specific flags.

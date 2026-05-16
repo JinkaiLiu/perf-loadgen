@@ -11,9 +11,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/config"
-	"github.com/JinkaiLiu/perf-loadgen/internal/stats"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/config"
+	"github.com/JinkaiLiu/vibeready/internal/stats"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // Master coordinates distributed runs across workers.
@@ -473,7 +473,7 @@ func (m *Master) handleDashboard(rw http.ResponseWriter, _ *http.Request) {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>perf-loadgen dashboard</title>
+  <title>vibeready dashboard</title>
   <style>
     :root { color-scheme: light; --bg:#f4f1ea; --panel:#fffdf8; --ink:#1e1b18; --muted:#6a625b; --accent:#b44536; --line:#ddd1c2; }
     body { margin:0; font-family: Georgia, "Iowan Old Style", serif; background: radial-gradient(circle at top, #fffdf8, #f0e6d7 60%, #e7dbc8); color:var(--ink); }
@@ -497,7 +497,7 @@ func (m *Master) handleDashboard(rw http.ResponseWriter, _ *http.Request) {
   <div class="wrap">
     <div class="hero">
       <div>
-        <h1>perf-loadgen distributed dashboard</h1>
+        <h1>vibeready distributed dashboard</h1>
         <p id="subtitle">Waiting for a job...</p>
       </div>
       <div class="status" id="job-status">idle</div>

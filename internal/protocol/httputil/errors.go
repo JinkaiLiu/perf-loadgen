@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // ClassifyRequestError maps a Go error to a stable error category.

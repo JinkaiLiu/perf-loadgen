@@ -3,8 +3,8 @@ package distributed
 import (
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/config"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/config"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // JobRequest is sent by master to each worker.

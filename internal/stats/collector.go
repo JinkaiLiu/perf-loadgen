@@ -3,8 +3,8 @@ package stats
 import (
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/util"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/util"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // Collector aggregates request results without storing unbounded raw samples.
@@ -23,6 +23,7 @@ type Collector struct {
 	maxTTFT            time.Duration
 	requestsWithTokens int64
 	totalOutputTokens  int64
+	tokensEstimated    bool
 	totalTokenRate     float64
 	streamingAborted   int64
 	statusCodes        map[int]int64
@@ -105,6 +106,9 @@ func (c *Collector) Add(result types.RunResult) {
 	if result.OutputTokens > 0 {
 		c.requestsWithTokens++
 		c.totalOutputTokens += result.OutputTokens
+		if result.TokensEstimated {
+			c.tokensEstimated = true
+		}
 	}
 	if result.TokensPerSecond > 0 {
 		c.totalTokenRate += result.TokensPerSecond
@@ -141,8 +145,8 @@ func (c *Collector) Add(result types.RunResult) {
 	if result.Model != "" && c.model == "" {
 		c.model = result.Model
 	}
-	// Cache hit: any response that explicitly reports cache status.
-	if result.CacheReported || result.Provider != "" || result.CacheHit {
+	// Cache hit: only count requests where the server explicitly reported cache status.
+	if result.CacheReported || result.CacheHit {
 		c.cacheRequests++
 		if result.CacheHit {
 			c.cacheHits++
@@ -291,6 +295,7 @@ func (c *Collector) Summary() types.Summary {
 	}
 
 	summary.TotalOutputTokens = c.totalOutputTokens
+	summary.TokensEstimated = c.tokensEstimated
 	if c.requestsWithTokens > 0 {
 		summary.AvgTokensPerSecond = c.totalTokenRate / float64(c.requestsWithTokens)
 	}

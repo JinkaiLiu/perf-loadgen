@@ -16,8 +16,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/protocol/httputil"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/protocol/httputil"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // frame opcodes
@@ -142,6 +142,7 @@ func (r *Runner) Run(ctx context.Context, req types.RequestSpec) (types.RunResul
 	collectedText := strings.TrimSpace(textBuilder.String())
 	if collectedText != "" {
 		result.OutputTokens = int64(len(strings.Fields(collectedText)))
+	result.TokensEstimated = true
 	}
 	if result.OutputTokens > 0 && result.GenerationTime > 0 {
 		result.TokensPerSecond = float64(result.OutputTokens) / result.GenerationTime.Seconds()

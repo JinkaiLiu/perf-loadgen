@@ -6,8 +6,8 @@ import (
 	"io"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/protocol/httputil"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/protocol/httputil"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/dynamicpb"
@@ -148,6 +148,7 @@ func (r *StreamRunner) Run(ctx context.Context, req types.RequestSpec) (types.Ru
 	}
 	if result.OutputTokens == 0 && chunkCount > 0 {
 		result.OutputTokens = int64(chunkCount)
+		result.TokensEstimated = true
 	}
 
 	return result, nil

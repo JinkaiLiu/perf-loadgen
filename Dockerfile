@@ -1,4 +1,4 @@
-# Multi-stage build for perf-loadgen binaries.
+# Multi-stage build for vibeready binaries.
 FROM golang:1.25-alpine AS builder
 WORKDIR /src
 COPY go.mod go.sum ./

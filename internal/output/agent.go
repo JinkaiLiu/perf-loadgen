@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/config"
-	"github.com/JinkaiLiu/perf-loadgen/internal/util"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/config"
+	"github.com/JinkaiLiu/vibeready/internal/util"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // WriteAgentReport generates a Markdown report designed to be pasted into a coding agent.
@@ -15,7 +15,7 @@ import (
 func WriteAgentReport(path string, cfg config.Config, summary types.Summary) error {
 	var b strings.Builder
 
-	b.WriteString("# Load Test Report\n\n")
+	b.WriteString("# VibeReady Report\n\n")
 
 	// Context.
 	b.WriteString("## Test Configuration\n\n")
@@ -124,25 +124,25 @@ func writeDiagnostics(b *strings.Builder, s types.Summary) {
 	issues := 0
 
 	if s.ErrorRate > 0.01 {
-		b.WriteString(fmt.Sprintf("- **High error rate (%.2f%%)**: Check for timeouts, rate limiting, or server errors. ", s.ErrorRate*100))
+		b.WriteString(fmt.Sprintf("- **Elevated error rate (%.2f%%)**: Common causes: timeouts, rate limiting, or upstream server errors. ", s.ErrorRate*100))
 		issues++
 	}
 	if s.Percentiles.P99 > s.AvgLatency*3 {
 		b.WriteString(fmt.Sprintf("- **Long tail latency**: P99 (%s) is %.1fx the average. ", util.FormatDuration(s.Percentiles.P99), float64(s.Percentiles.P99)/float64(s.AvgLatency)))
-		b.WriteString("Check for resource contention or GC pauses.\n")
+		b.WriteString("Common causes include resource contention or GC pauses.\n")
 		issues++
 	}
 	if s.UpstreamLatencyRatio > 0 && s.UpstreamLatencyRatio > 0.8 {
-		b.WriteString(fmt.Sprintf("- **Bottleneck is the model API (%.0f%% of total time)**: ", s.UpstreamLatencyRatio*100))
-		b.WriteString("Optimizing your backend code will have limited impact. Consider:\n")
+		b.WriteString(fmt.Sprintf("- **Likely model API bottleneck (%.0f%% of total time)**: ", s.UpstreamLatencyRatio*100))
+		b.WriteString("Optimizing your backend code may have limited impact. Consider:\n")
 		b.WriteString("  - Switching to a faster model or provider\n")
 		b.WriteString("  - Enabling streaming if not already used\n")
 		b.WriteString("  - Adding caching for repeated prompts\n")
 		issues++
 	}
 	if s.UpstreamLatencyRatio > 0 && s.UpstreamLatencyRatio < 0.3 {
-		b.WriteString(fmt.Sprintf("- **Bottleneck is your backend (%.0f%% overhead)**: ", (1-s.UpstreamLatencyRatio)*100))
-		b.WriteString("The model responds quickly but your code adds significant latency. Check:\n")
+		b.WriteString(fmt.Sprintf("- **Likely backend-side bottleneck (%.0f%% overhead)**: ", (1-s.UpstreamLatencyRatio)*100))
+		b.WriteString("The model responds quickly but your code adds significant latency. Common causes:\n")
 		b.WriteString("  - Connection pooling and keep-alive settings\n")
 		b.WriteString("  - Synchronous processing that could be parallelized\n")
 		b.WriteString("  - Serialization/deserialization overhead\n")
@@ -155,7 +155,7 @@ func writeDiagnostics(b *strings.Builder, s types.Summary) {
 	has429 := s.StatusCodes[429] > 0
 	if has429 {
 		b.WriteString(fmt.Sprintf("- **Rate limited (429)**: %d requests hit rate limits. ", s.StatusCodes[429]))
-		b.WriteString("Implement client-side rate limiting or request a higher quota from the model provider.\n")
+		b.WriteString("Consider: client-side rate limiting, exponential backoff, or a higher API tier.\n")
 		issues++
 	}
 	if s.CacheHitRate == 0 && s.Provider != "" {

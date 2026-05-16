@@ -1,4 +1,4 @@
-# perf-loadgen
+# vibeready
 
 A lightweight, model-aware load testing tool for AI API applications.
 One command tells you whether your AI app is ready for real users.
@@ -27,7 +27,7 @@ AI app users do not care about HTTP response time. They care about:
 | **429 / rate limit** | Hitting the model API limit. Your app returns errors even if your code is fine. |
 | **Upstream vs backend** | Is the bottleneck your code, your VPS, or the model API? Without this split, you optimize the wrong thing. |
 
-perf-loadgen measures all of these with zero configuration. If your backend adds
+vibeready measures all of these with zero configuration. If your backend adds
 a few response headers (the `x-ai-*` convention), it also tells you model
 provider, cache hit rate, input/output token counts, and estimated cost.
 
@@ -35,11 +35,11 @@ provider, cache hit rate, input/output token counts, and estimated cost.
 
 ```bash
 # Install (Go >= 1.25)
-git clone https://github.com/JinkaiLiu/perf-loadgen.git
-cd perf-loadgen && go build -o loadgen ./cmd/loadgen
+git clone https://github.com/JinkaiLiu/vibeready.git
+cd vibeready && go build -o vibeready ./cmd/loadgen
 
 # Run against your AI endpoint
-./loadgen \
+./vibeready \
   --url https://your-app.com/api/translate \
   --method POST \
   --headers "Content-Type:application/json" \
@@ -59,7 +59,7 @@ You can also try it locally with the bundled mock server:
 
 ```bash
 go run ./cmd/mockserver --port 8080 &
-./loadgen --url http://127.0.0.1:8080/infer --method POST \
+./vibeready --url http://127.0.0.1:8080/infer --method POST \
   --body '{"prompt":"hello"}' --concurrency 5 --duration 10s
 ```
 
@@ -107,7 +107,7 @@ error breakdown, upstream analysis, and **suggested actions** — for example:
 
 ### Semi-white-box AI metrics
 
-If your backend returns these response headers, perf-loadgen computes upstream
+If your backend returns these response headers, vibeready computes upstream
 latency, backend overhead, cache hit rate, and per-request token counts:
 
 ```
@@ -122,7 +122,8 @@ x-ai-cache-hit: false
 
 See [docs/semi-white-box.md](docs/semi-white-box.md) for integration instructions.
 
-### Advanced capabilities
+<details>
+<summary><strong>Advanced capabilities</strong> (click to expand)</summary>
 
 These exist and work, but are not required for the basic workflow:
 
@@ -132,10 +133,12 @@ These exist and work, but are not required for the basic workflow:
 | WebSocket (`ws://` / `wss://`) | RFC 6455, TLS. `--protocol websocket` |
 | Prometheus `/metrics` | `--metrics-port 9090` (binds 127.0.0.1) |
 | Real-time SSE dashboard | Distributed mode only. |
-| Docker | `docker build -t perf-loadgen .` |
+| Docker | `docker build -t vibeready .` |
 | Distributed master/worker | For throughput beyond a single machine |
 
 See [docs/advanced/](docs/advanced/) for detailed guides.
+
+</details>
 
 ## Why not just use k6?
 
@@ -146,7 +149,7 @@ HTTP load testing. But:
 - They do not tell you whether the bottleneck is your code or the model API.
 - Each generated script is different — no standardized re-test workflow.
 
-perf-loadgen is not a k6 replacement. It focuses on a narrower problem:
+vibeready is not a k6 replacement. It focuses on a narrower problem:
 standardized AI app readiness checks with model-aware metrics and agent-friendly
 reports that stay comparable across runs.
 
@@ -164,7 +167,7 @@ reports that stay comparable across runs.
 
 - [ ] Tiktoken-based tokenizer (currently heuristic word-count)
 - [ ] Persistent job queue with disk/RDB backend
-- [ ] k6 script export (`perf-loadgen export k6`)
+- [ ] k6 script export (`vibeready export k6`)
 - [ ] OpenTelemetry trace export
 
 ## License

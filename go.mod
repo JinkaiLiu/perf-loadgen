@@ -1,4 +1,4 @@
-module github.com/JinkaiLiu/perf-loadgen
+module github.com/JinkaiLiu/vibeready
 
 go 1.25.5
 

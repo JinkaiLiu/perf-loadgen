@@ -8,9 +8,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/cli"
-	"github.com/JinkaiLiu/perf-loadgen/internal/distributed"
-	"github.com/JinkaiLiu/perf-loadgen/internal/output"
+	"github.com/JinkaiLiu/vibeready/internal/cli"
+	"github.com/JinkaiLiu/vibeready/internal/distributed"
+	"github.com/JinkaiLiu/vibeready/internal/output"
 )
 
 func main() {

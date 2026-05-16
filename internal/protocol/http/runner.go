@@ -8,8 +8,8 @@ import (
 	stdhttp "net/http"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/protocol/httputil"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/protocol/httputil"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // Runner executes single HTTP requests using a shared client.

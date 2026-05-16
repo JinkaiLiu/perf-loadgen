@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/engine"
-	"github.com/JinkaiLiu/perf-loadgen/internal/protocol"
+	"github.com/JinkaiLiu/vibeready/internal/engine"
+	"github.com/JinkaiLiu/vibeready/internal/protocol"
 )
 
 // jobHandle tracks an in-flight job on the worker.

@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/config"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/config"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 type fakeRunner struct {

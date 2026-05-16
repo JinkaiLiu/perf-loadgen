@@ -3,7 +3,7 @@
 ## Development
 
 ```bash
-git clone https://github.com/JinkaiLiu/perf-loadgen.git
+git clone https://github.com/JinkaiLiu/vibeready.git
 cd perf-loadgen
 
 # Build

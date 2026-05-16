@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // x-ai-* response header names (proposed lightweight standard for AI API observability).

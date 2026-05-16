@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/protocol/httputil"
-	"github.com/JinkaiLiu/perf-loadgen/pkg/types"
+	"github.com/JinkaiLiu/vibeready/internal/protocol/httputil"
+	"github.com/JinkaiLiu/vibeready/pkg/types"
 )
 
 // Options defines how the streaming runner should interpret streamed chunks.
@@ -206,6 +206,7 @@ func (r *Runner) consumeStream(resp *stdhttp.Response, start time.Time) (types.R
 	}
 	if result.OutputTokens == 0 && collectedText != "" {
 		result.OutputTokens = int64(len(strings.Fields(collectedText)))
+		result.TokensEstimated = true
 	}
 	if result.TokensPerSecond == 0 && result.OutputTokens > 0 && result.GenerationTime > 0 {
 		result.TokensPerSecond = float64(result.OutputTokens) / result.GenerationTime.Seconds()

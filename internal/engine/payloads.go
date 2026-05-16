@@ -4,7 +4,7 @@ import (
 	"os"
 	"sync/atomic"
 
-	"github.com/JinkaiLiu/perf-loadgen/internal/config"
+	"github.com/JinkaiLiu/vibeready/internal/config"
 )
 
 type payloadPicker struct {
