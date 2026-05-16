@@ -7,12 +7,16 @@ One command tells you whether your AI app is ready for real users.
 
 You built an AI app — a translation service, a chatbot, a document summarizer —
 using Cursor, Codex, or Claude Code. It calls OpenAI, DeepSeek, or any LLM API.
-You're about to share the link with friends or a small team. You need to know:
-will it hold up?
+You're about to share the link. Before you do, here is what you actually need to know:
 
-If you need to stress-test a static website or measure raw HTTP throughput, use
-wrk or k6. If you need to know whether your AI app is ready for 10 friends, use
-vibeready.
+- 5 friends open it at once. Does anyone see an error?
+- Someone pastes a long document. Does the request time out?
+- The AI response feels slow. Is it your code, your $6 VPS, or the model API?
+- You're on DeepSeek's free tier. Are you hitting rate limits?
+- The streaming output looks choppy. Is that normal or is something broken?
+
+These are not "load testing" questions. They are "should I share this link yet" questions.
+vibeready answers them with one command.
 
 ## Why this exists
 
