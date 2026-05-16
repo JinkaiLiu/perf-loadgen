@@ -33,37 +33,90 @@ provider, cache hit rate, input/output token counts, and estimated cost.
 
 ## Quick Start
 
-```bash
-# Install (Go >= 1.25)
-git clone https://github.com/JinkaiLiu/vibeready.git
-cd vibeready && go build -o vibeready ./cmd/loadgen
+### 1. Install
 
-# Run against your AI endpoint
+```bash
+git clone https://github.com/JinkaiLiu/vibeready.git
+cd vibeready
+go build -o vibeready ./cmd/loadgen
+```
+
+Requires Go >= 1.25.
+
+### 2. Run your first readiness check
+
+```bash
 ./vibeready \
-  --url https://your-app.com/api/translate \
+  --url http://localhost:3000/api/chat \
   --method POST \
   --headers "Content-Type:application/json" \
-  --body '{"text":"Explain quantum computing in simple terms","target":"zh"}' \
-  --concurrency 10 \
-  --duration 30s \
+  --body '{"message":"Explain quantum computing in simple terms"}' \
+  --concurrency 5 \
+  --duration 10s \
   --timeout 45s \
   --output result.json \
   --agent-context agent-report.md
 ```
 
-That is it. One command, two output files. `result.json` has the raw data.
-`agent-report.md` is a structured report you can paste directly into your
-coding agent for follow-up fixes.
-
-You can also try it locally with the bundled mock server:
+For most AI apps, you only need to change two fields:
 
 ```bash
-go run ./cmd/mockserver --port 8080 &
-./vibeready --url http://127.0.0.1:8080/infer --method POST \
-  --body '{"prompt":"hello"}' --concurrency 5 --duration 10s
+--url   your AI backend API endpoint
+--body  a valid JSON payload accepted by that endpoint
 ```
 
-## What the output looks like
+### 3. What each flag means
+
+| Flag | Description | Required? |
+|------|-------------|-----------|
+| `--url` | The backend API endpoint that receives user input and calls the LLM | Required |
+| `--method` | HTTP method. Most AI app APIs use `POST` | Recommended |
+| `--headers` | Request headers. JSON APIs usually need `Content-Type:application/json` | Usually needed |
+| `--body` | The JSON payload sent on every request. Must match what your backend expects | Usually needed |
+| `--concurrency` | Number of virtual users sending requests at once. Start with `5` | Recommended |
+| `--duration` | How long the check runs. Start with `10s`, then try `30s` | Required (or `--requests`) |
+| `--timeout` | Max time to wait for one request before counting it as failed | Recommended |
+| `--output` | Writes machine-readable JSON results to a file | Optional |
+| `--agent-context` | Writes a Markdown report you can paste into Cursor, Codex, or Claude Code | Strongly recommended |
+
+### 4. Not sure what `--url` or `--body` should be?
+
+If you built your app with Cursor, Codex, Claude Code, or another coding agent,
+ask it to inspect your project:
+
+> I want to check whether my AI app is ready for real users using vibeready.
+> Please inspect this project and find the backend API route that receives user
+> input and calls the LLM. Tell me the full local URL, HTTP method, required
+> headers, and a valid JSON request body. Then give me a complete vibeready
+> command using this shape:
+>
+> ```
+> ./vibeready \
+>   --url ... \
+>   --method POST \
+>   --headers "Content-Type:application/json" \
+>   --body '...' \
+>   --concurrency 5 \
+>   --duration 10s \
+>   --timeout 45s \
+>   --output result.json \
+>   --agent-context agent-report.md
+> ```
+
+### 5. Common request body examples
+
+Use the field names your backend expects. Common names: `message`, `prompt`, `text`, `question`.
+
+```json
+{"message":"Explain quantum computing in simple terms"}
+{"prompt":"Explain quantum computing in simple terms"}
+{"text":"Explain quantum computing in simple terms","target":"zh"}
+{"question":"What is quantum computing?"}
+```
+
+### 6. After the run
+
+vibeready produces three outputs:
 
 **Console** (always printed):
 
@@ -81,17 +134,27 @@ Cache Hit %:    12.0%
 429 Count:      3 (1.1%)
 ```
 
-**Agent report** (`--agent-context agent-report.md`):
+**`result.json`** — machine-readable results for scripts or future comparison.
 
-A structured Markdown report with test configuration, latency percentiles,
-error breakdown, upstream analysis, and **suggested actions** — for example:
+**`agent-report.md`** — a Markdown report designed for coding agents, with
+suggested actions. For example:
 
-> **Bottleneck: Upstream Model API** — 74% of total latency is model API time.
-> Optimizing your backend code will have limited impact. Consider prompt
-> compression, a smaller model, or a provider with lower latency.
+> **Likely model API bottleneck (74% of total time)** — Optimizing your backend
+> code may have limited impact. Consider: faster model, prompt compression, or
+> a provider with lower latency.
 
-> **Rate Limiting Detected (429)** — 3 requests returned 429. Add request
-> throttling with `--qps`, exponential backoff retry, or upgrade your API tier.
+> **Rate limited (429)** — 3 requests hit rate limits. Consider: client-side
+> throttling, exponential backoff, or a higher API tier.
+
+### 7. Paste the report back to your coding agent
+
+After the run, open `agent-report.md` and paste it into your coding agent:
+
+> Here is my vibeready report. Please identify whether this AI app is ready for
+> a small group of real users, find the main bottleneck, and suggest concrete
+> code changes. Then give me a safer re-test command.
+
+vibeready detects → coding agent fixes → vibeready re-tests.
 
 ## Features
 
@@ -162,13 +225,6 @@ reports that stay comparable across runs.
 - [Docker & Kubernetes](docs/advanced/deployment.md)
 - [Architecture](docs/architecture.md)
 - [中文文档](README_zh.md)
-
-## Roadmap
-
-- [ ] Tiktoken-based tokenizer (currently heuristic word-count)
-- [ ] Persistent job queue with disk/RDB backend
-- [ ] k6 script export (`vibeready export k6`)
-- [ ] OpenTelemetry trace export
 
 ## License
 
