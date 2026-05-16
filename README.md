@@ -5,17 +5,16 @@ One command tells you whether your AI app is ready for real users.
 
 ## Who this is for
 
-You built an AI app — a translation service, a chatbot, a document summarizer —
+You built an AI app — a translation service, a chatbot, a document summarizer, and so on —
 using Cursor, Codex, or Claude Code. It calls OpenAI, DeepSeek, or any LLM API.
-You're about to share the link. Before you do, here is what you actually need to know:
+You're about to share the link with friends, a small team, or even launch it publicly.
+Before you do, here is what you actually need to know:
 
 - 5 friends open it at once. Does anyone see an error?
 - Someone pastes a long document. Does the request time out?
-- The AI response feels slow. Is it your code, your $6 VPS, or the model API?
-- You're on DeepSeek's free tier. Are you hitting rate limits?
+- The AI response feels slow. Is it your code, your VPS, or the model API?
 - The streaming output looks choppy. Is that normal or is something broken?
 
-These are not "load testing" questions. They are "should I share this link yet" questions.
 vibeready answers them with one command.
 
 ## Why this exists
@@ -72,6 +71,9 @@ For most AI apps, you only need to change two fields:
 --url   your AI backend API endpoint
 --body  a valid JSON payload accepted by that endpoint
 ```
+
+You may also want to adjust `--concurrency` (how many virtual users) and `--duration`
+(how long to run). The defaults are conservative — bump them for a more realistic test.
 
 ### 3. What each flag means
 
