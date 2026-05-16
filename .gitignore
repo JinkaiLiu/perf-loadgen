@@ -1,12 +1,13 @@
 # Binaries
+/vibeready
 /loadgen
 /loadgen-master
 /loadgen-worker
 /mockserver
 
 # Output files
-/result.json
-*.json.out
+result*.json
+agent-report*.md
 
 # OS
 .DS_Store
