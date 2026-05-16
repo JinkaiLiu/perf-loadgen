@@ -1,0 +1,45 @@
+# Default values for perf-loadgen distributed deployment.
+
+image:
+  repository: perf-loadgen
+  tag: latest
+  pullPolicy: IfNotPresent
+
+master:
+  replicas: 1
+  dashboardPort: 7070
+  maxConcurrentJobs: 10
+  authSecret: ""
+  persistent: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+worker:
+  replicas: 3
+  capacity: 3
+  authSecret: ""
+  resources:
+    requests:
+      cpu: 200m
+      memory: 128Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+
+config:
+  targetURL: "http://inference-service:8080/infer"
+  method: "POST"
+  body: '{"prompt":"hello"}'
+  concurrency: 20
+  duration: "30s"
+  timeout: "5s"
+
+service:
+  type: ClusterIP
+  dashboardPort: 7070
+  workerPort: 8081

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-worker
+  labels:
+    app: perf-loadgen
+    component: worker
+spec:
+  serviceName: {{ .Release.Name }}-worker
+  replicas: {{ .Values.worker.replicas }}
+  selector:
+    matchLabels:
+      app: perf-loadgen
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: perf-loadgen
+        component: worker
+    spec:
+      containers:
+      - name: worker
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/usr/local/bin/loadgen-worker"]
+        args:
+        - --id
+        - "$(POD_NAME)"
+        - --capacity
+        - "{{ .Values.worker.capacity }}"
+        {{- if .Values.worker.authSecret }}
+        - --auth-secret
+        - "{{ .Values.worker.authSecret }}"
+        {{- end }}
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        ports:
+        - containerPort: {{ .Values.service.workerPort }}
+          name: worker
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: worker
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: worker
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.worker.resources | nindent 10 }}

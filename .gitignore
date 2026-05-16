@@ -1,0 +1,26 @@
+# Binaries
+/loadgen
+/loadgen-master
+/loadgen-worker
+/mockserver
+
+# Output files
+/result.json
+*.json.out
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+.claude/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+*.exe
+*.test
+*.out

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-config
+  labels:
+    app: perf-loadgen
+data:
+  job-config.json: |
+    {
+      "url": "{{ .Values.config.targetURL }}",
+      "method": "{{ .Values.config.method }}",
+      "body": {{ .Values.config.body | toJson }},
+      "concurrency": {{ .Values.config.concurrency }},
+      "duration": "{{ .Values.config.duration }}",
+      "timeout": "{{ .Values.config.timeout }}"
+    }

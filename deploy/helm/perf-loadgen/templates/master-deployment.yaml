@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-master
+  labels:
+    app: perf-loadgen
+    component: master
+spec:
+  replicas: {{ .Values.master.replicas }}
+  selector:
+    matchLabels:
+      app: perf-loadgen
+      component: master
+  template:
+    metadata:
+      labels:
+        app: perf-loadgen
+        component: master
+    spec:
+      containers:
+      - name: master
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/usr/local/bin/loadgen-master"]
+        args:
+        - --persistent
+        - --dashboard-addr
+        - ":{{ .Values.master.dashboardPort }}"
+        - --max-concurrent-jobs
+        - "{{ .Values.master.maxConcurrentJobs }}"
+        {{- if .Values.master.authSecret }}
+        - --auth-secret
+        - "{{ .Values.master.authSecret }}"
+        {{- end }}
+        - --workers
+        - "{{ range $i, $e := until (int .Values.worker.replicas) }}{{ if $i }},{{ end }}http://{{ $.Release.Name }}-worker-{{ $i }}.{{ $.Release.Name }}-worker:{{ $.Values.service.workerPort }}{{ end }}"
+        ports:
+        - containerPort: {{ .Values.master.dashboardPort }}
+          name: dashboard
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: dashboard
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: dashboard
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        volumeMounts:
+        - name: config
+          mountPath: /etc/perf-loadgen
+          readOnly: true
+        resources:
+          {{- toYaml .Values.master.resources | nindent 10 }}
+      volumes:
+      - name: config
+        configMap:
+          name: {{ .Release.Name }}-config
