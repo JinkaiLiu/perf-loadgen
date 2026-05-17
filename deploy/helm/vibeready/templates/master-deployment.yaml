@@ -3,18 +3,18 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-master
   labels:
-    app: perf-loadgen
+    app: vibeready
     component: master
 spec:
   replicas: {{ .Values.master.replicas }}
   selector:
     matchLabels:
-      app: perf-loadgen
+      app: vibeready
       component: master
   template:
     metadata:
       labels:
-        app: perf-loadgen
+        app: vibeready
         component: master
     spec:
       containers:
@@ -51,7 +51,7 @@ spec:
           periodSeconds: 5
         volumeMounts:
         - name: config
-          mountPath: /etc/perf-loadgen
+          mountPath: /etc/vibeready
           readOnly: true
         resources:
           {{- toYaml .Values.master.resources | nindent 10 }}

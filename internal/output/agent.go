@@ -177,7 +177,7 @@ func writeDiagnostics(b *strings.Builder, s types.Summary) {
 
 func buildRetestCommand(cfg config.Config) string {
 	var b strings.Builder
-	b.WriteString("./loadgen")
+	b.WriteString("./vibeready")
 	b.WriteString(" --url ")
 	b.WriteString(cfg.URL)
 	if cfg.Method != "" && cfg.Method != "GET" {

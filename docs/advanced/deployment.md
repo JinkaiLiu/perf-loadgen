@@ -3,8 +3,8 @@
 ## Docker
 
 ```bash
-docker build -t perf-loadgen .
-docker run perf-loadgen \
+docker build -t vibeready .
+docker run vibeready \
   --url http://target:8080/infer --method POST \
   --body '{"prompt":"hello"}' --concurrency 10 --duration 30s
 
@@ -13,7 +13,7 @@ docker run --entrypoint /usr/local/bin/loadgen-master vibeready --persistent --d
 docker run --entrypoint /usr/local/bin/loadgen-worker vibeready --capacity 3
 ```
 
-The image contains all four binaries: `loadgen`, `loadgen-master`, `loadgen-worker`, `mockserver`.
+The image contains all binaries: `vibeready`, `loadgen-master`, `loadgen-worker`, `mockserver`.
 
 ## Kubernetes (advanced)
 
@@ -22,7 +22,7 @@ deployment option. For most users, the single-binary CLI or Docker workflow is
 the recommended path.
 
 ```bash
-helm install loadgen ./deploy/helm/perf-loadgen \
+helm install vibeready ./deploy/helm/vibeready \
   --set config.targetURL=http://inference-service:8080/infer \
   --set worker.replicas=3
 ```

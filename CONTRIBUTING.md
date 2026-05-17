@@ -4,7 +4,7 @@
 
 ```bash
 git clone https://github.com/JinkaiLiu/vibeready.git
-cd perf-loadgen
+cd vibeready
 
 # Build
 go build ./cmd/...

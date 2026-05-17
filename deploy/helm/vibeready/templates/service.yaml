@@ -3,12 +3,12 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-master
   labels:
-    app: perf-loadgen
+    app: vibeready
     component: master
 spec:
   type: {{ .Values.service.type }}
   selector:
-    app: perf-loadgen
+    app: vibeready
     component: master
   ports:
   - port: {{ .Values.service.dashboardPort }}
@@ -20,12 +20,12 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-worker
   labels:
-    app: perf-loadgen
+    app: vibeready
     component: worker
 spec:
   clusterIP: None
   selector:
-    app: perf-loadgen
+    app: vibeready
     component: worker
   ports:
   - port: {{ .Values.service.workerPort }}

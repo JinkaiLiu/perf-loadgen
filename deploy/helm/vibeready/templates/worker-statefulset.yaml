@@ -3,19 +3,19 @@ kind: StatefulSet
 metadata:
   name: {{ .Release.Name }}-worker
   labels:
-    app: perf-loadgen
+    app: vibeready
     component: worker
 spec:
   serviceName: {{ .Release.Name }}-worker
   replicas: {{ .Values.worker.replicas }}
   selector:
     matchLabels:
-      app: perf-loadgen
+      app: vibeready
       component: worker
   template:
     metadata:
       labels:
-        app: perf-loadgen
+        app: vibeready
         component: worker
     spec:
       containers:

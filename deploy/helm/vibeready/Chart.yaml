@@ -1,0 +1,6 @@
+apiVersion: v2
+name: vibeready
+description: A lightweight, model-aware load testing tool for AI API applications
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

@@ -1,6 +1,6 @@
 # Semi-White-Box AI Metrics
 
-If your backend adds standardized response headers, perf-loadgen computes
+If your backend adds standardized response headers, vibeready computes
 richer metrics: upstream latency breakdown, cache efficiency, per-request token
 counts, and provider/model identification.
 
@@ -18,11 +18,11 @@ Add these headers to your AI backend responses:
 | `x-ai-output-tokens` | int | `120` | Output token count |
 | `x-ai-cache-hit` | bool | `false` | Whether this response was served from cache |
 
-All are optional. perf-loadgen degrades gracefully when headers are absent.
+All are optional. vibeready degrades gracefully when headers are absent.
 
 ## What this unlocks
 
-With these headers, perf-loadgen computes:
+With these headers, vibeready computes:
 
 ```text
 backend_overhead  = total_latency - upstream_latency

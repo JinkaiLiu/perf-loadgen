@@ -1,7 +1,7 @@
-# Default values for perf-loadgen distributed deployment.
+# Default values for vibeready distributed deployment.
 
 image:
-  repository: perf-loadgen
+  repository: vibeready
   tag: latest
   pullPolicy: IfNotPresent
 
