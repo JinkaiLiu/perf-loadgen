@@ -179,7 +179,7 @@ func TestJobQueueEnqueueDequeue(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	qj, err := q.Dequeue(ctx)
+	qj, err := q.Dequeue(ctx, func() {})
 	if err != nil {
 		t.Fatalf("Dequeue returned error: %v", err)
 	}
@@ -197,7 +197,7 @@ func TestJobQueueComplete(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	_, _ = q.Dequeue(ctx)
+	_, _ = q.Dequeue(ctx, func() {})
 	q.Complete(id, DashboardState{JobID: id, Status: "completed"})
 
 	info, ok := q.Get(id)
@@ -236,7 +236,7 @@ func TestJobQueueCancelIsTerminal(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	if _, err := q.Dequeue(ctx); err != nil {
+	if _, err := q.Dequeue(ctx, func() {}); err != nil {
 		t.Fatalf("Dequeue returned error: %v", err)
 	}
 	if err := q.Cancel(id); err != nil {

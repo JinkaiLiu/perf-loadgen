@@ -1,7 +1,11 @@
 # vibeready
 
+[![CI](https://github.com/JinkaiLiu/vibeready/actions/workflows/ci.yml/badge.svg)](https://github.com/JinkaiLiu/vibeready/actions/workflows/ci.yml)
+
 A lightweight, model-aware load testing tool for AI API applications.
 One command tells you whether your AI app is ready for real users.
+
+![Demo](demo/demo.gif)
 
 ## Who this is for
 
@@ -193,7 +197,7 @@ These exist and work, but are not required for the basic workflow:
 | Area | Support |
 |------|---------|
 | gRPC (unary + server-streaming) | Via server reflection. `--protocol grpc` |
-| WebSocket (`ws://` / `wss://`) | RFC 6455, TLS. `--protocol websocket` |
+| WebSocket (`ws://` / `wss://`) | Text frames, ping/pong, TLS. `--protocol websocket` |
 | Prometheus `/metrics` | `--metrics-port 9090` (binds 127.0.0.1) |
 | Real-time SSE dashboard | Distributed mode only. |
 | Docker | `docker build -t vibeready .` |

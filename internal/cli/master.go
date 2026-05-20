@@ -10,10 +10,10 @@ import (
 
 // MasterOptions holds distributed master specific flags.
 type MasterOptions struct {
-	Workers         []string
-	DashboardAddr   string
-	Persistent      bool
-	AuthSecret      string
+	Workers           []string
+	DashboardAddr     string
+	Persistent        bool
+	AuthSecret        string
 	MaxConcurrentJobs int
 }
 

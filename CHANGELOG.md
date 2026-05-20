@@ -9,7 +9,7 @@ Initial release.
 - HTTP Streaming — SSE / JSONL / raw line-delimited, TTFT, token, tok/s, streaming abort metrics
 - gRPC Unary — server reflection + dynamicpb + protojson
 - gRPC Server-Streaming — per-message ITL tracking, token field extraction
-- WebSocket — zero-dependency RFC 6455, ws:// + wss:// (TLS), subprotocol support
+- WebSocket — text/close/ping/pong frames, ws:// + wss:// (TLS), subprotocol support
 
 ### Execution Modes
 - Fixed duration, fixed request count, QPS-limited, ramp-up

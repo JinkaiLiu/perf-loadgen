@@ -63,6 +63,7 @@ func (m *Master) broadcastState() {
 
 // StartBackground starts the background job processor for persistent mode.
 func (m *Master) StartBackground(ctx context.Context) {
+	sem := make(chan struct{}, m.maxConcurrent)
 	go func() {
 		for {
 			select {
@@ -73,20 +74,37 @@ func (m *Master) StartBackground(ctx context.Context) {
 			default:
 			}
 
-			qj, err := m.queue.Dequeue(ctx)
-			if err != nil {
+			// Acquire worker slot first so status transition from
+			// pending→running corresponds to actual execution, not
+			// just dispatch.
+			select {
+			case sem <- struct{}{}:
+			case <-ctx.Done():
+				return
+			case <-m.stopCh:
 				return
 			}
 
 			jobCtx, cancel := context.WithCancel(ctx)
-			qj.Cancel = cancel
-
-			state, err := m.Run(jobCtx, qj.Spec.Config, qj.Spec.Workers)
+			qj, err := m.queue.Dequeue(ctx, cancel)
 			if err != nil {
-				m.queue.Fail(qj.ID, err)
-			} else {
-				m.queue.Complete(qj.ID, state)
+				<-sem
+				cancel()
+				return
 			}
+
+			go func() {
+				defer func() {
+					cancel()
+					<-sem
+				}()
+				state, err := m.Run(jobCtx, qj.Spec.Config, qj.Spec.Workers)
+				if err != nil {
+					m.queue.Fail(qj.ID, err)
+				} else {
+					m.queue.Complete(qj.ID, state)
+				}
+			}()
 		}
 	}()
 }

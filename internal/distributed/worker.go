@@ -3,6 +3,7 @@ package distributed
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"strings"
 	"sync"
@@ -25,10 +26,10 @@ type Worker struct {
 	capacity   int
 	secret     string
 
-	mu         sync.RWMutex
-	jobs       map[string]*jobHandle
-	lastJobID  string
-	lastSeen   time.Time
+	mu        sync.RWMutex
+	jobs      map[string]*jobHandle
+	lastJobID string
+	lastSeen  time.Time
 }
 
 // NewWorker creates a worker with the given configuration.
@@ -148,6 +149,9 @@ func (w *Worker) handleRun(rw http.ResponseWriter, req *http.Request) {
 			Error:    "failed to build runner: " + buildErr.Error(),
 		})
 		return
+	}
+	if closer, ok := runner.(io.Closer); ok {
+		defer closer.Close()
 	}
 	report, err := engine.New(runner).RunDetailed(jobCtx, job.Config)
 	ended := time.Now()

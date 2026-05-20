@@ -24,7 +24,13 @@ import (
 const (
 	opText  = 0x1
 	opClose = 0x8
+	opPing  = 0x9
+	opPong  = 0xA
 )
+
+// maxFrameSize limits the payload of a single WebSocket frame to prevent
+// unbounded memory allocation from a malicious or misconfigured server.
+const maxFrameSize = 10 << 20 // 10 MiB
 
 // Runner executes WebSocket requests and extracts streaming metrics.
 type Runner struct {
@@ -120,12 +126,29 @@ func (r *Runner) Run(ctx context.Context, req types.RequestSpec) (types.RunResul
 		prevChunkTime = now
 		lastChunkTime = now
 
-		if opcode == opText {
+		switch opcode {
+		case opText:
 			textBuilder.Write(payload)
 			textBuilder.WriteByte(' ')
-		}
-		if opcode == opClose {
+		case opClose:
 			sawClose = true
+			break
+		case opPing:
+			// Reply with pong as required by RFC 6455 §5.5.2.
+			if err := writeFrame(conn, opPong, payload); err != nil {
+				cat := httputil.ClassifyRequestError(err)
+				result.Success = false
+				result.ErrorCategory = cat
+				result.ErrorMessage = err.Error()
+				result.BytesRead = bytesRead
+				result.Latency = time.Since(start)
+				result.StreamingAborted = true
+				return result, err
+			}
+		}
+		// opPong, continuation (0x0), binary (0x2) — silently ignored.
+
+		if opcode == opClose {
 			break
 		}
 	}
@@ -142,7 +165,7 @@ func (r *Runner) Run(ctx context.Context, req types.RequestSpec) (types.RunResul
 	collectedText := strings.TrimSpace(textBuilder.String())
 	if collectedText != "" {
 		result.OutputTokens = int64(len(strings.Fields(collectedText)))
-	result.TokensEstimated = true
+		result.TokensEstimated = true
 	}
 	if result.OutputTokens > 0 && result.GenerationTime > 0 {
 		result.TokensPerSecond = float64(result.OutputTokens) / result.GenerationTime.Seconds()
@@ -345,6 +368,10 @@ func readFrame(conn net.Conn) (opcode byte, payload []byte, err error) {
 			return 0, nil, err
 		}
 		length = binary.BigEndian.Uint64(ext)
+	}
+
+	if length > maxFrameSize {
+		return 0, nil, fmt.Errorf("websocket: frame payload too large (%d > %d)", length, maxFrameSize)
 	}
 
 	// Masking key (if present).

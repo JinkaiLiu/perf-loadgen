@@ -54,7 +54,10 @@ func TestIntegrationHTTPUnary(t *testing.T) {
 		t.Fatalf("Parse returned error: %v", err)
 	}
 
-	runner, err := protocol.BuildRunner(cfg); if err != nil { t.Fatalf("BuildRunner returned error: %v", err) }
+	runner, err := protocol.BuildRunner(cfg)
+	if err != nil {
+		t.Fatalf("BuildRunner returned error: %v", err)
+	}
 	summary, err := engine.New(runner).Run(context.Background(), cfg)
 	if err != nil {
 		t.Fatalf("Run returned error: %v", err)
@@ -98,7 +101,10 @@ func TestIntegrationHTTPStreaming(t *testing.T) {
 		t.Fatalf("Parse returned error: %v", err)
 	}
 
-	runner, err := protocol.BuildRunner(cfg); if err != nil { t.Fatalf("BuildRunner returned error: %v", err) }
+	runner, err := protocol.BuildRunner(cfg)
+	if err != nil {
+		t.Fatalf("BuildRunner returned error: %v", err)
+	}
 	summary, err := engine.New(runner).Run(context.Background(), cfg)
 	if err != nil {
 		t.Fatalf("Run returned error: %v", err)
@@ -138,7 +144,10 @@ func TestIntegrationConfigFile(t *testing.T) {
 		t.Fatalf("expected URL from config file, got %s", cfg.URL)
 	}
 
-	runner, err := protocol.BuildRunner(cfg); if err != nil { t.Fatalf("BuildRunner returned error: %v", err) }
+	runner, err := protocol.BuildRunner(cfg)
+	if err != nil {
+		t.Fatalf("BuildRunner returned error: %v", err)
+	}
 	summary, err := engine.New(runner).Run(context.Background(), cfg)
 	if err != nil {
 		t.Fatalf("Run returned error: %v", err)

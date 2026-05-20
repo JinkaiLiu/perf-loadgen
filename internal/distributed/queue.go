@@ -67,8 +67,9 @@ func (q *JobQueue) Enqueue(spec JobSpec) (string, error) {
 	return id, nil
 }
 
-// Dequeue blocks until a pending job is available, then marks it running.
-func (q *JobQueue) Dequeue(ctx context.Context) (*queuedJob, error) {
+// Dequeue blocks until a pending job is available, returns it, and
+// atomically attaches cancel so Cancel() sees a non-nil func immediately.
+func (q *JobQueue) Dequeue(ctx context.Context, cancel context.CancelFunc) (*queuedJob, error) {
 	for {
 		q.mu.Lock()
 		for _, id := range q.order {
@@ -76,6 +77,7 @@ func (q *JobQueue) Dequeue(ctx context.Context) (*queuedJob, error) {
 			if qj.Status == JobPending {
 				qj.Status = JobRunning
 				qj.StartedAt = time.Now()
+				qj.Cancel = cancel
 				q.mu.Unlock()
 				return qj, nil
 			}

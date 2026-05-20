@@ -78,15 +78,15 @@ type JobSpec struct {
 
 // JobInfo describes a job in the master's API.
 type JobInfo struct {
-	ID        string          `json:"id"`
-	Status    JobStatus       `json:"status"`
-	Workers   []string        `json:"workers"`
-	CreatedAt time.Time       `json:"created_at"`
-	StartedAt time.Time       `json:"started_at,omitempty"`
-	EndedAt   time.Time       `json:"ended_at,omitempty"`
-	Result    DashboardState  `json:"result,omitempty"`
-	Error     string          `json:"error,omitempty"`
-	Summary   *types.Summary  `json:"summary,omitempty"`
+	ID        string         `json:"id"`
+	Status    JobStatus      `json:"status"`
+	Workers   []string       `json:"workers"`
+	CreatedAt time.Time      `json:"created_at"`
+	StartedAt time.Time      `json:"started_at,omitempty"`
+	EndedAt   time.Time      `json:"ended_at,omitempty"`
+	Result    DashboardState `json:"result,omitempty"`
+	Error     string         `json:"error,omitempty"`
+	Summary   *types.Summary `json:"summary,omitempty"`
 }
 
 // WorkerCapacityInfo is the per-worker capacity view used by the balancer.

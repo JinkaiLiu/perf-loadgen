@@ -21,6 +21,15 @@ jobs:
       with:
         go-version: ${{ matrix.go }}
 
+    - name: Format check
+      run: |
+        fmt=$(gofmt -l .)
+        if [ -n "$fmt" ]; then
+          echo "Files not gofmt'd:"
+          echo "$fmt"
+          exit 1
+        fi
+
     - name: Build
       run: go build ./...
 
@@ -29,3 +38,20 @@ jobs:
 
     - name: Vet
       run: go vet ./...
+
+    - name: Race
+      run: go test -race -count=1 -timeout 120s ./...
+
+    - name: Docker build
+      run: docker build -t vibeready .
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v4
+      with:
+        version: v3.17.0
+
+    - name: Helm lint
+      run: helm lint ./deploy/helm/vibeready
+
+    - name: Helm template
+      run: helm template vibeready ./deploy/helm/vibeready

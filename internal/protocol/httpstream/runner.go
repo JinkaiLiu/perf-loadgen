@@ -184,6 +184,7 @@ func (r *Runner) consumeStream(resp *stdhttp.Response, start time.Time) (types.R
 				}
 			}
 			if err == io.EOF {
+				sawDone = true
 				break
 			}
 			if err != nil {

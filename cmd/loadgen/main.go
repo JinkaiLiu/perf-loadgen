@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -23,6 +24,9 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to build runner: %v\n", err)
 		os.Exit(1)
+	}
+	if closer, ok := runner.(io.Closer); ok {
+		defer closer.Close()
 	}
 	observers := make([]engine.Observer, 0, 1)
 	var exporter *output.PrometheusExporter

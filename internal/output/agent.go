@@ -178,20 +178,84 @@ func writeDiagnostics(b *strings.Builder, s types.Summary) {
 func buildRetestCommand(cfg config.Config) string {
 	var b strings.Builder
 	b.WriteString("./vibeready")
-	b.WriteString(" --url ")
-	b.WriteString(cfg.URL)
+	b.WriteString(" --url '")
+	b.WriteString(shellQuote(cfg.URL))
+	b.WriteString("'")
 	if cfg.Method != "" && cfg.Method != "GET" {
 		b.WriteString(" --method ")
 		b.WriteString(cfg.Method)
 	}
+	if len(cfg.Headers) > 0 {
+		parts := make([]string, 0, len(cfg.Headers))
+		for k, v := range cfg.Headers {
+			parts = append(parts, k+":"+v)
+		}
+		b.WriteString(" --headers '")
+		b.WriteString(strings.Join(parts, ","))
+		b.WriteString("'")
+	}
 	if len(cfg.Body) > 0 {
 		body := string(cfg.Body)
-		if len(body) > 120 {
-			body = body[:117] + "..."
+		if len(body) > 4000 {
+			body = body[:3997] + "..."
 		}
 		b.WriteString(" --body '")
 		b.WriteString(strings.ReplaceAll(body, "'", "'\\''"))
 		b.WriteString("'")
+	} else if cfg.BodyFile != "" {
+		b.WriteString(" --body-file '")
+		b.WriteString(shellQuote(cfg.BodyFile))
+		b.WriteString("'")
+	} else if cfg.PayloadDir != "" {
+		b.WriteString(" --payload-dir '")
+		b.WriteString(shellQuote(cfg.PayloadDir))
+		b.WriteString("'")
+	}
+	if cfg.Protocol != "" && cfg.Protocol != "http" {
+		b.WriteString(" --protocol ")
+		b.WriteString(cfg.Protocol)
+	}
+	if cfg.Protocol == "grpc" || cfg.Protocol == "grpc-stream" {
+		b.WriteString(" --proto-service ")
+		b.WriteString(cfg.GRPCService)
+		b.WriteString(" --proto-method ")
+		b.WriteString(cfg.GRPCMethod)
+		if cfg.GRPCTLS {
+			b.WriteString(" --grpc-tls")
+		}
+		if cfg.GRPCTokenField != "" {
+			b.WriteString(" --grpc-token-field ")
+			b.WriteString(cfg.GRPCTokenField)
+		}
+	}
+	if cfg.Protocol == "websocket" && cfg.WSSubprotocol != "" {
+		b.WriteString(" --ws-subprotocol ")
+		b.WriteString(cfg.WSSubprotocol)
+	}
+	if cfg.Streaming {
+		b.WriteString(" --stream")
+		if cfg.StreamFormat != "" && cfg.StreamFormat != "auto" {
+			b.WriteString(" --stream-format ")
+			b.WriteString(cfg.StreamFormat)
+		}
+		if cfg.StreamDoneMarker != "" && cfg.StreamDoneMarker != "[DONE]" {
+			b.WriteString(" --stream-done-marker '")
+			b.WriteString(shellQuote(cfg.StreamDoneMarker))
+			b.WriteString("'")
+		}
+		if len(cfg.StreamTextKeys) > 0 && !streamKeysEqual(cfg.StreamTextKeys, []string{"content", "text", "token", "output_text", "delta"}) {
+			b.WriteString(" --stream-text-keys '")
+			b.WriteString(strings.Join(cfg.StreamTextKeys, ","))
+			b.WriteString("'")
+		}
+		if len(cfg.StreamTokenKeys) > 0 && !streamKeysEqual(cfg.StreamTokenKeys, []string{"output_tokens", "completion_tokens", "generated_tokens"}) {
+			b.WriteString(" --stream-token-keys '")
+			b.WriteString(strings.Join(cfg.StreamTokenKeys, ","))
+			b.WriteString("'")
+		}
+	}
+	if cfg.ModelPricePer1K > 0 {
+		b.WriteString(fmt.Sprintf(" --model-price %.4f", cfg.ModelPricePer1K))
 	}
 	b.WriteString(fmt.Sprintf(" --concurrency %d", cfg.Concurrency))
 	if cfg.Duration > 0 {
@@ -204,8 +268,40 @@ func buildRetestCommand(cfg config.Config) string {
 	b.WriteString(" --timeout ")
 	b.WriteString(cfg.Timeout.String())
 	if cfg.Output != "" {
-		b.WriteString(" --output ")
-		b.WriteString(cfg.Output)
+		b.WriteString(" --output '")
+		b.WriteString(shellQuote(cfg.Output))
+		b.WriteString("'")
+	}
+	if cfg.AgentContext != "" {
+		b.WriteString(" --agent-context '")
+		b.WriteString(shellQuote(cfg.AgentContext))
+		b.WriteString("'")
+	}
+	if cfg.MetricsPort > 0 {
+		b.WriteString(fmt.Sprintf(" --metrics-port %d", cfg.MetricsPort))
+	}
+	if cfg.QPS > 0 {
+		b.WriteString(fmt.Sprintf(" --qps %.1f", cfg.QPS))
+	}
+	if cfg.RampUp > 0 {
+		b.WriteString(" --ramp-up ")
+		b.WriteString(cfg.RampUp.String())
 	}
 	return b.String()
+}
+
+func shellQuote(s string) string {
+	return strings.ReplaceAll(s, "'", "'\\''")
+}
+
+func streamKeysEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if !strings.EqualFold(a[i], b[i]) {
+			return false
+		}
+	}
+	return true
 }

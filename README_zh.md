@@ -177,7 +177,7 @@ x-ai-cache-hit           → 是否命中缓存
 | 领域 | 支持情况 |
 |------|---------|
 | gRPC（unary + server-streaming） | 通过 server reflection。`--protocol grpc` |
-| WebSocket（`ws://` / `wss://`） | RFC 6455，TLS。`--protocol websocket` |
+| WebSocket（`ws://` / `wss://`） | Text 帧、ping/pong、TLS。`--protocol websocket` |
 | Prometheus `/metrics` | `--metrics-port 9090`（绑定 127.0.0.1） |
 | SSE 实时 Dashboard | 仅分布式模式 |
 | Docker | `docker build -t vibeready .` |

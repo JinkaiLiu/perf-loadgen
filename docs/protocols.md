@@ -66,7 +66,7 @@ For streaming, TTFT = first `RecvMsg`, ITL = between consecutive `RecvMsg`.
 
 ## WebSocket
 
-Zero-dependency RFC 6455 implementation. Each request is a full lifecycle:
+WebSocket client (text/close/ping/pong frames, 10 MiB frame limit). Each request is a full lifecycle:
 TCP/TLS dial → HTTP upgrade → send text frame → receive frames → close.
 
 TLS is auto-detected from the URL scheme: `ws://` uses plain TCP (port 80),

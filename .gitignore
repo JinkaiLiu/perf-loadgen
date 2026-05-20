@@ -21,6 +21,9 @@ Thumbs.db
 *.swo
 *~
 
+# Demo recording artifacts
+demo/*.cast
+
 # Build artifacts
 *.exe
 *.test

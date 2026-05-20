@@ -12,7 +12,7 @@ import (
 type Factory func(cfg config.Config) (runner.Runner, error)
 
 var (
-	mu       sync.RWMutex
+	mu        sync.RWMutex
 	factories = map[string]Factory{}
 )
 
