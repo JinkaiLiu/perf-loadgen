@@ -21,8 +21,9 @@ Thumbs.db
 *.swo
 *~
 
-# Demo recording artifacts
+# Demo artifacts (keep only the GIF)
 demo/*.cast
+demo/*-post.md
 
 # Build artifacts
 *.exe
