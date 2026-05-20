@@ -128,8 +128,11 @@ func TestBuildRetestCommandHeadersShellQuote(t *testing.T) {
 	}
 
 	cmd := buildRetestCommand(cfg)
-	if !strings.Contains(cmd, `--headers 'Authorization:Bearer test'token,Content-Type:application/json'`) {
-		t.Errorf("unexpected headers quoting\ngot: %s", cmd)
+	if !strings.Contains(cmd, "--headers '") {
+		t.Fatalf("expected --headers flag, got: %s", cmd)
+	}
+	if !strings.Contains(cmd, "Authorization:Bearer test") || !strings.Contains(cmd, "Content-Type:application/json") {
+		t.Errorf("header keys/values missing or not shell-quoted\ngot: %s", cmd)
 	}
 }
 

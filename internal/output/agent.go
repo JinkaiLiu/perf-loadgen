@@ -188,7 +188,7 @@ func buildRetestCommand(cfg config.Config) string {
 	if len(cfg.Headers) > 0 {
 		parts := make([]string, 0, len(cfg.Headers))
 		for k, v := range cfg.Headers {
-			parts = append(parts, k+":"+v)
+			parts = append(parts, k+":"+shellQuote(v))
 		}
 		b.WriteString(" --headers '")
 		b.WriteString(strings.Join(parts, ","))

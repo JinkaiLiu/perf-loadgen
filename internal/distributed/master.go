@@ -224,7 +224,7 @@ func (m *Master) Handler() http.Handler {
 	mux.HandleFunc("/api/stream", m.handleSSE)
 	mux.HandleFunc("/health", m.handleHealth)
 	mux.HandleFunc("/ready", m.handleReady)
-	return mux
+	return MasterAuthMiddleware(m.secret, mux)
 }
 
 func (m *Master) handleHealth(rw http.ResponseWriter, _ *http.Request) {
@@ -530,6 +530,7 @@ func (m *Master) handleDashboard(rw http.ResponseWriter, _ *http.Request) {
   </div>
   <script>
     const fmt = (n) => typeof n === 'number' ? n.toFixed(2) : n;
+    const esc = (s) => { if (typeof s !== 'string') return s; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); };
     function render(data) {
       document.getElementById('job-status').textContent = data.status || 'idle';
       document.getElementById('subtitle').textContent = data.job_id ? ('Job ' + data.job_id + ' | workers ' + data.worker_count) : 'Waiting for a job...';
@@ -550,7 +551,7 @@ func (m *Master) handleDashboard(rw http.ResponseWriter, _ *http.Request) {
       document.getElementById('workers').innerHTML = (data.workers || []).map((worker) => {
         const s = worker.result ? worker.result.summary : {};
         const health = worker.health || {};
-        return '<tr><td>' + (worker.worker_id || '-') + '</td><td>' + (worker.address || '-') + '</td><td>' + (worker.status || '-') + '</td><td>' + (s.total_requests || 0) + '</td><td>' + fmt(s.requests_per_second || 0) + '</td><td>' + (s.avg_ttft_human || '0s') + '</td><td>' + fmt(s.avg_tokens_per_second || 0) + '</td><td>' + (health.last_seen || '-') + '</td><td>' + (worker.error || '') + '</td></tr>';
+        return '<tr><td>' + esc(worker.worker_id || '-') + '</td><td>' + esc(worker.address || '-') + '</td><td>' + esc(worker.status || '-') + '</td><td>' + (s.total_requests || 0) + '</td><td>' + fmt(s.requests_per_second || 0) + '</td><td>' + esc(s.avg_ttft_human || '0s') + '</td><td>' + fmt(s.avg_tokens_per_second || 0) + '</td><td>' + esc(health.last_seen || '-') + '</td><td>' + esc(worker.error || '') + '</td></tr>';
       }).join('');
     }
     if (window.EventSource) {

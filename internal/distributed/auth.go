@@ -59,6 +59,29 @@ func AuthMiddleware(secret string, next http.Handler) http.Handler {
 	})
 }
 
+// MasterAuthMiddleware protects master API write endpoints with a Bearer token.
+// GET/HEAD and /health are public; POST/PUT/DELETE require Authorization: Bearer <secret>.
+func MasterAuthMiddleware(secret string, next http.Handler) http.Handler {
+	if secret == "" {
+		return next
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet || r.Method == http.MethodHead || r.URL.Path == "/health" || r.URL.Path == "/ready" {
+			next.ServeHTTP(w, r)
+			return
+		}
+		auth := r.Header.Get(authHeader)
+		if !strings.HasPrefix(auth, "Bearer ") || !hmac.Equal(
+			[]byte(strings.TrimPrefix(auth, "Bearer ")),
+			[]byte(secret),
+		) {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 func extractJobID(r *http.Request) string {
 	if strings.HasPrefix(r.URL.Path, "/cancel/") {
 		return strings.TrimPrefix(r.URL.Path, "/cancel/")

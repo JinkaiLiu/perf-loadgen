@@ -1,7 +1,11 @@
 # vibeready
 
+[![CI](https://github.com/JinkaiLiu/vibeready/actions/workflows/ci.yml/badge.svg)](https://github.com/JinkaiLiu/vibeready/actions/workflows/ci.yml)
+
 面向 AI API 应用的轻量级、模型感知压测工具。
 一条命令告诉你：你的 AI 应用是否准备好上线了。
+
+![Demo](demo/demo.gif)
 
 ## 适合谁
 

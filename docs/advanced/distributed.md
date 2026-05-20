@@ -21,23 +21,30 @@ Open `http://127.0.0.1:7070` for the real-time dashboard.
 ## Persistent (job server)
 
 ```bash
-./loadgen-master --persistent --dashboard-addr :7070
+./loadgen-master --persistent --dashboard-addr 127.0.0.1:7070 --auth-secret mysecret
 
-# Submit
-curl -X POST http://localhost:7070/api/jobs \
+# Submit (with Bearer token)
+curl -X POST http://127.0.0.1:7070/api/jobs \
   -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer mysecret' \
   -d '{"config":{...},"workers":["http://127.0.0.1:8081"]}'
 
 # List   → GET /api/jobs
 # Status → GET /api/jobs/{id}
-# Cancel → DELETE /api/jobs/{id}
+# Cancel → DELETE /api/jobs/{id} (requires Authorization header)
 ```
 
 ## Authentication
 
 Set `--auth-secret` on master and all workers. Master signs each dispatch with
-HMAC-SHA256(jobID, secret). Workers verify before executing. `/health` is
-always unauthenticated.
+HMAC-SHA256(jobID, secret). Workers verify before executing.
+
+Additionally, when `--auth-secret` is set on the master, write endpoints
+(POST/DELETE /api/jobs) require an `Authorization: Bearer <secret>` header.
+GET endpoints and the dashboard remain public.
+
+Always bind the dashboard to `127.0.0.1` unless you have a reverse proxy
+handling auth. `/health` is always unauthenticated.
 
 ## Capacity slots
 
