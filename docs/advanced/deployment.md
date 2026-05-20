@@ -24,7 +24,9 @@ the recommended path.
 ```bash
 helm install vibeready ./deploy/helm/vibeready \
   --set config.targetURL=http://inference-service:8080/infer \
-  --set worker.replicas=3
+  --set worker.replicas=3 \
+  --set master.authSecret=$(openssl rand -hex 32) \
+  --set worker.authSecret=$(openssl rand -hex 32)
 ```
 
 Resources deployed:

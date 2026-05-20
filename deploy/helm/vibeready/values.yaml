@@ -9,6 +9,8 @@ master:
   replicas: 1
   dashboardPort: 7070
   maxConcurrentJobs: 10
+  # IMPORTANT: Set a shared secret for production use. Protects master API
+  # write endpoints (Bearer token) and master→worker HMAC signing.
   authSecret: ""
   persistent: true
   resources:
@@ -22,6 +24,7 @@ master:
 worker:
   replicas: 3
   capacity: 3
+  # Must match master.authSecret.
   authSecret: ""
   resources:
     requests:
